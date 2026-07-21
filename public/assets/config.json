@@ -1,6 +1,6 @@
 {
-  "supabaseUrl": "http://127.0.0.1:54321",
-  "supabaseAnonKey": "625729a08b95bf1b7ff351a663f3a23c",
+  "supabaseUrl": "https://opkwlsanprzeyzqdmhqv.supabase.co",
+  "supabasePublishableKey": "sb_publishable_R1jNYFjsKvQUrvKHknsfxA_bcGlLfLt",
   "discordClientId": "",
   "runtimeMode": "standalone"
 }

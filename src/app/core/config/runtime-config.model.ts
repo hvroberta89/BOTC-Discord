@@ -4,7 +4,7 @@ export type RuntimeMode =
 
 export interface RuntimeConfig {
   readonly supabaseUrl: string;
-  readonly supabaseAnonKey: string;
+  readonly supabasePublishableKey: string;
   readonly discordClientId: string;
   readonly runtimeMode: RuntimeMode;
 }

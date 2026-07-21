@@ -1,35 +1,32 @@
 import {
   ApplicationConfig,
-  provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection,
 } from '@angular/core';
-import { provideRouter, withComponentInputBinding, } from '@angular/router';
-import { provideAuth } from './core/auth/data-access/auth.providers';
-import { RUNTIME_CONFIG, } from './core/config/runtime-config.token';
-import { RuntimeConfig, } from './core/config/runtime-config.model';
-import { provideSupabase, } from './core/supabase/supabase.providers';
+import { provideRouter } from '@angular/router';
+
 import { routes } from './app.routes';
+import {
+  RuntimeConfig,
+} from './core/config/runtime-config.model';
+import {
+  RUNTIME_CONFIG,
+} from './core/config/runtime-config.token';
+import {
+  provideSupabase,
+} from './core/supabase/supabase.providers';
 
 export function createAppConfig(
   runtimeConfig: RuntimeConfig,
 ): ApplicationConfig {
   return {
     providers: [
-      provideBrowserGlobalErrorListeners(),
       provideZonelessChangeDetection(),
-
-      provideRouter(
-        routes,
-        withComponentInputBinding(),
-      ),
-
+      provideRouter(routes),
       {
         provide: RUNTIME_CONFIG,
         useValue: runtimeConfig,
       },
-
       provideSupabase(),
-      provideAuth(),
     ],
   };
 }

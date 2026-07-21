@@ -1,25 +1,36 @@
-import { RuntimeConfig } from './runtime-config.model';
+import {
+  RuntimeConfig,
+  RuntimeMode,
+} from './runtime-config.model';
 
-const CONFIG_URL = '/assets/config.json';
+const RUNTIME_CONFIG_URL =
+  '/assets/config.json';
 
-export async function loadRuntimeConfig(): Promise<RuntimeConfig> {
-  const response = await fetch(CONFIG_URL, {
-    cache: 'no-store',
-  });
+export async function loadRuntimeConfig():
+Promise<RuntimeConfig> {
+  const response = await fetch(
+    RUNTIME_CONFIG_URL,
+    {
+      cache: 'no-store',
+    },
+  );
 
   if (!response.ok) {
     throw new Error(
-      `Runtime configuration could not be loaded: ${response.status}`,
+      `Runtime configuration could not be loaded. ` +
+      `HTTP status: ${response.status}.`,
     );
   }
 
-  const config: unknown = await response.json();
+  const value: unknown = await response.json();
 
-  if (!isRuntimeConfig(config)) {
-    throw new Error('Runtime configuration is invalid.');
+  if (!isRuntimeConfig(value)) {
+    throw new Error(
+      'Runtime configuration is invalid.',
+    );
   }
 
-  return config;
+  return value;
 }
 
 export function isRuntimeConfig(
@@ -31,13 +42,18 @@ export function isRuntimeConfig(
 
   return (
     isNonEmptyString(value['supabaseUrl']) &&
-    isNonEmptyString(value['supabaseAnonKey']) &&
-    typeof value['discordClientId'] === 'string' &&
+    isNonEmptyString(
+      value['supabasePublishableKey'],
+    ) &&
+    typeof value['discordClientId'] ===
+      'string' &&
     isRuntimeMode(value['runtimeMode'])
   );
 }
 
-function isNonEmptyString(value: unknown): value is string {
+function isNonEmptyString(
+  value: unknown,
+): value is string {
   return (
     typeof value === 'string' &&
     value.trim().length > 0
@@ -46,7 +62,7 @@ function isNonEmptyString(value: unknown): value is string {
 
 function isRuntimeMode(
   value: unknown,
-): value is RuntimeConfig['runtimeMode'] {
+): value is RuntimeMode {
   return (
     value === 'standalone' ||
     value === 'discord-activity'
