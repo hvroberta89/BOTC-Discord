@@ -1,0 +1,6 @@
+{
+  "supabaseUrl": "",
+  "supabaseAnonKey": "",
+  "discordClientId": "",
+  "runtimeMode": "standalone"
+}
