@@ -2,15 +2,15 @@ import {
   EnvironmentProviders,
   makeEnvironmentProviders,
 } from '@angular/core';
-import {
-  createClient,
-  SupabaseClient,
-} from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
+
 import { RuntimeConfig } from '../config/runtime-config.model';
+import { RUNTIME_CONFIG } from '../config/runtime-config.token';
+import { Database } from './database.types';
 import {
-  RUNTIME_CONFIG,
-} from '../config/runtime-config.token';
-import { SUPABASE_CLIENT } from './supabase-client.token';
+  ApplicationSupabaseClient,
+  SUPABASE_CLIENT,
+} from './supabase-client.token';
 
 export function provideSupabase(): EnvironmentProviders {
   return makeEnvironmentProviders([
@@ -24,8 +24,8 @@ export function provideSupabase(): EnvironmentProviders {
 
 function createSupabaseClient(
   config: RuntimeConfig,
-): SupabaseClient {
-  return createClient(
+): ApplicationSupabaseClient {
+  return createClient<Database>(
     config.supabaseUrl,
     config.supabaseAnonKey,
     {

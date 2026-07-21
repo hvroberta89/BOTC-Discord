@@ -30,10 +30,17 @@ export function isRuntimeConfig(
   }
 
   return (
-    typeof value['supabaseUrl'] === 'string' &&
-    typeof value['supabaseAnonKey'] === 'string' &&
+    isNonEmptyString(value['supabaseUrl']) &&
+    isNonEmptyString(value['supabaseAnonKey']) &&
     typeof value['discordClientId'] === 'string' &&
     isRuntimeMode(value['runtimeMode'])
+  );
+}
+
+function isNonEmptyString(value: unknown): value is string {
+  return (
+    typeof value === 'string' &&
+    value.trim().length > 0
   );
 }
 

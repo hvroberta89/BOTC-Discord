@@ -1,30 +1,24 @@
-<section class="hero">
-      <p class="eyebrow">
-        Online social deduction
-      </p>
+@if (authService.status() === 'initializing') {
+  <p>Authentication is loading…</p>
+}
 
-      <h1>
-        Clocktower
-      </h1>
+@if (authService.status() === 'anonymous') {
+  <button type="button" (click)="signIn()">
+    Sign in with Discord
+  </button>
+}
 
-      <p class="description">
-        Create a game, invite your group and manage
-        the grimoire in real time.
-      </p>
+@if (authService.status() === 'authenticated') {
+  <p>
+    Signed in as
+    {{ authService.user()?.user_metadata?.['full_name'] }}
+  </p>
 
-      <div class="actions">
-        <a
-          class="primary-action"
-          routerLink="/games/new"
-        >
-          Create game
-        </a>
+  <a routerLink="/games/new">
+    Create game
+  </a>
 
-        <a
-          class="secondary-action"
-          routerLink="/games/join"
-        >
-          Join game
-        </a>
-      </div>
-    </section>
+  <a routerLink="/games/join">
+    Join game
+  </a>
+}

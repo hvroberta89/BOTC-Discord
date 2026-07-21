@@ -3,25 +3,11 @@ import {
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection,
 } from '@angular/core';
-import {
-  provideRouter,
-  withComponentInputBinding,
-} from '@angular/router';
-import {
-  RUNTIME_CONFIG,
-} from './core/config/runtime-config.token';
-import {
-  RuntimeConfig,
-} from './core/config/runtime-config.model';
-import {
-  PLATFORM_INTEGRATION,
-} from './core/platform/platform-integration.token';
-import {
-  StandalonePlatformIntegration,
-} from './core/config/standalone-platform.integration';
-import {
-  provideSupabase,
-} from './core/supabase/supabase.providers';
+import { provideRouter, withComponentInputBinding, } from '@angular/router';
+import { provideAuth } from './core/auth/data-access/auth.providers';
+import { RUNTIME_CONFIG, } from './core/config/runtime-config.token';
+import { RuntimeConfig, } from './core/config/runtime-config.model';
+import { provideSupabase, } from './core/supabase/supabase.providers';
 import { routes } from './app.routes';
 
 export function createAppConfig(
@@ -41,12 +27,9 @@ export function createAppConfig(
         provide: RUNTIME_CONFIG,
         useValue: runtimeConfig,
       },
-      {
-        provide: PLATFORM_INTEGRATION,
-        useClass: StandalonePlatformIntegration,
-      },
 
       provideSupabase(),
+      provideAuth(),
     ],
   };
 }
