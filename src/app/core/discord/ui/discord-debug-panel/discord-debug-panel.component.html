@@ -4,7 +4,13 @@
   <dl>
     <div>
       <dt>Runtime mode</dt>
-      <dd>{{ runtimeMode }}</dd>
+      <dd>
+        {{
+          discord.isDiscordActivity()
+            ? 'discord-activity'
+            : 'standalone'
+        }}
+      </dd>
     </div>
 
     <div>

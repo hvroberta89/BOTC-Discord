@@ -1,6 +1,5 @@
 import { inject, Injectable, signal } from '@angular/core';
 
-import { RUNTIME_CONFIG } from '../../config/runtime-config.token';
 import { DiscordSdkService } from './discord-sdk.service';
 import {
   DiscordConnectionStatus,
@@ -8,13 +7,19 @@ import {
   DiscordUser,
   DiscordVoiceChannel,
 } from './discord.models';
+import {
+  isDiscordActivityRuntime,
+} from '../util/discord-runtime.util';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DiscordService {
-  private readonly runtimeConfig = inject(RUNTIME_CONFIG);
-  private readonly discordSdkService = inject(DiscordSdkService);
+  private readonly discordSdkService =
+    inject(DiscordSdkService);
+
+  readonly isDiscordActivity =
+    signal(isDiscordActivityRuntime());
 
   readonly status =
     signal<DiscordConnectionStatus>('disabled');
@@ -35,10 +40,7 @@ export class DiscordService {
     signal<readonly DiscordUser[]>([]);
 
   async initialize(): Promise<void> {
-    if (
-      this.runtimeConfig.runtimeMode !==
-      'discord-activity'
-    ) {
+    if (!this.isDiscordActivity()) {
       this.status.set('disabled');
       return;
     }
