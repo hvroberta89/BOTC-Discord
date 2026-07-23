@@ -1,5 +1,9 @@
 import { inject, Injectable } from '@angular/core';
-import { DiscordSDK } from '@discord/embedded-app-sdk';
+import {
+  DiscordSDK,
+  Events,
+  type Types,
+} from '@discord/embedded-app-sdk';
 
 import { RUNTIME_CONFIG } from '../../config/runtime-config.token';
 
@@ -21,12 +25,32 @@ export class DiscordSdkService {
     await discordSdk.ready();
   }
 
-  async getParticipants() {
+  async getParticipants(): Promise<
+    Types.GetActivityInstanceConnectedParticipantsResponse
+  > {
+    return this.getSdk().commands
+      .getInstanceConnectedParticipants();
+  }
+
+  async subscribeToParticipants(
+    handler: (
+      response:
+        Types.GetActivityInstanceConnectedParticipantsResponse,
+    ) => void,
+  ): Promise<void> {
+    await this.getSdk().subscribe(
+      Events.ACTIVITY_INSTANCE_PARTICIPANTS_UPDATE,
+      handler,
+    );
+  }
+
+  private getSdk(): DiscordSDK {
     if (!this.discordSdk) {
-      throw new Error('Discord SDK is not initialized.');
+      throw new Error(
+        'Discord SDK is not initialized.',
+      );
     }
 
-    return this.discordSdk.commands
-      .getInstanceConnectedParticipants();
+    return this.discordSdk;
   }
 }

@@ -1,4 +1,5 @@
 import { inject, Injectable, signal } from '@angular/core';
+import type { Types } from '@discord/embedded-app-sdk';
 
 import { DiscordSdkService } from './discord-sdk.service';
 import {
@@ -51,18 +52,15 @@ export class DiscordService {
     try {
       await this.discordSdkService.initialize();
 
+      await this.discordSdkService
+        .subscribeToParticipants((response) => {
+          this.updateParticipants(response);
+        });
+
       const response =
         await this.discordSdkService.getParticipants();
 
-      const participants: readonly DiscordUser[] =
-        response.participants.map((participant) => ({
-          id: participant.id,
-          username: participant.username,
-          globalName: participant.global_name ?? null,
-          avatar: participant.avatar ?? null,
-        }));
-
-      this.participants.set(participants);
+      this.updateParticipants(response);
 
       this.status.set('connected');
     } catch (error: unknown) {
@@ -74,5 +72,21 @@ export class DiscordService {
           : 'Discord initialization failed.',
       );
     }
+  }
+
+  private updateParticipants(
+    response:
+      Types.GetActivityInstanceConnectedParticipantsResponse,
+  ): void {
+    const participants: readonly DiscordUser[] =
+      response.participants.map((participant) => ({
+        id: participant.id,
+        username: participant.username,
+        globalName:
+          participant.global_name ?? null,
+        avatar: participant.avatar ?? null,
+      }));
+
+    this.participants.set(participants);
   }
 }
