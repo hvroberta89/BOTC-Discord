@@ -64,14 +64,39 @@ export class DiscordService {
 
       this.status.set('connected');
     } catch (error: unknown) {
-      this.status.set('failed');
+      console.error(
+        'Discord initialization error:',
+        error,
+      );
 
+      this.status.set('failed');
       this.errorMessage.set(
-        error instanceof Error
-          ? error.message
-          : 'Discord initialization failed.',
+        this.getErrorMessage(error),
       );
     }
+  }
+
+  private getErrorMessage(error: unknown): string {
+    if (error instanceof Error) {
+      return error.message;
+    }
+
+    if (typeof error === 'string') {
+      return error;
+    }
+
+    if (
+      typeof error === 'object' &&
+      error !== null
+    ) {
+      try {
+        return JSON.stringify(error);
+      } catch {
+        return String(error);
+      }
+    }
+
+    return 'Discord initialization failed.';
   }
 
   private updateParticipants(
