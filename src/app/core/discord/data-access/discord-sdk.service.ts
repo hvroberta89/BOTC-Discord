@@ -21,7 +21,12 @@ export class DiscordSdkService {
     await discordSdk.ready();
   }
 
-  isInitialized(): boolean {
-    return this.discordSdk !== null;
+  async getParticipants() {
+    if (!this.discordSdk) {
+      throw new Error('Discord SDK is not initialized.');
+    }
+
+    return this.discordSdk.commands
+      .getInstanceConnectedParticipants();
   }
 }

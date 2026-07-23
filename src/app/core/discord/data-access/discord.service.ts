@@ -51,6 +51,19 @@ export class DiscordService {
     try {
       await this.discordSdkService.initialize();
 
+      const response =
+        await this.discordSdkService.getParticipants();
+
+      const participants: readonly DiscordUser[] =
+        response.participants.map((participant) => ({
+          id: participant.id,
+          username: participant.username,
+          globalName: participant.global_name ?? null,
+          avatar: participant.avatar ?? null,
+        }));
+
+      this.participants.set(participants);
+
       this.status.set('connected');
     } catch (error: unknown) {
       this.status.set('failed');
