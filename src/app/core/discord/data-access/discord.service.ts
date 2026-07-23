@@ -1,13 +1,9 @@
-import { inject, Injectable, signal } from '@angular/core';
-import type { Types } from '@discord/embedded-app-sdk';
+import { inject, Injectable } from '@angular/core';
 
+import { DiscordAuthService } from './discord-auth.service';
 import { DiscordSdkService } from './discord-sdk.service';
-import {
-  DiscordConnectionStatus,
-  DiscordGuild,
-  DiscordUser,
-  DiscordVoiceChannel,
-} from './discord.models';
+import { DiscordGatewayService } from './discord-gateway.service';
+import { mapParticipantsToUsers } from './discord.mapper';import { DiscordStore } from './discord.store';
 import {
   isDiscordActivityRuntime,
 } from '../util/discord-runtime.util';
@@ -19,64 +15,87 @@ export class DiscordService {
   private readonly discordSdkService =
     inject(DiscordSdkService);
 
+  private readonly discordAuthService =
+    inject(DiscordAuthService);
+
+  private readonly store =
+    inject(DiscordStore);
+
+  private readonly discordGatewayService =
+    inject(DiscordGatewayService);
+
   readonly isDiscordActivity =
-    signal(isDiscordActivityRuntime());
+    this.store.isDiscordActivity;
 
   readonly status =
-    signal<DiscordConnectionStatus>('disabled');
+    this.store.status;
 
   readonly errorMessage =
-    signal<string | null>(null);
+    this.store.errorMessage;
 
   readonly currentUser =
-    signal<DiscordUser | null>(null);
+    this.store.currentUser;
 
   readonly guild =
-    signal<DiscordGuild | null>(null);
+    this.store.guild;
 
   readonly voiceChannel =
-    signal<DiscordVoiceChannel | null>(null);
+    this.store.voiceChannel;
 
   readonly participants =
-    signal<readonly DiscordUser[]>([]);
+    this.store.participants;
 
   async initialize(): Promise<void> {
-    if (!this.isDiscordActivity()) {
-      this.status.set('disabled');
+    const isDiscordActivity =
+      isDiscordActivityRuntime();
+
+    this.store.setDiscordActivity(
+      isDiscordActivity,
+    );
+
+    if (!isDiscordActivity) {
+      this.store.reset();
       return;
     }
 
-    this.status.set('connecting');
-    this.errorMessage.set(null);
+    this.store.setStatus('connecting');
+    this.store.setErrorMessage(null);
 
     try {
       await this.discordSdkService.initialize();
+      await this.discordAuthService.authenticate();
 
-      await this.discordSdkService
+      await this.discordGatewayService
         .subscribeToParticipants((response) => {
-          this.updateParticipants(response);
+          this.store.setParticipants(
+            mapParticipantsToUsers(response),
+          );
         });
 
       const response =
-        await this.discordSdkService.getParticipants();
+        await this.discordGatewayService.getParticipants();
 
-      this.updateParticipants(response);
+      this.store.setParticipants(
+        mapParticipantsToUsers(response),
+      );
 
-      this.status.set('connected');
+      this.store.setStatus('connected');
     } catch (error: unknown) {
       console.error(
         'Discord initialization error:',
         error,
       );
 
-      this.status.set('failed');
-      this.errorMessage.set(
+      this.store.setStatus('failed');
+      this.store.setErrorMessage(
         this.getErrorMessage(error),
       );
     }
   }
 
-  private getErrorMessage(error: unknown): string {
+  private getErrorMessage(
+    error: unknown,
+  ): string {
     if (error instanceof Error) {
       return error.message;
     }
@@ -97,21 +116,5 @@ export class DiscordService {
     }
 
     return 'Discord initialization failed.';
-  }
-
-  private updateParticipants(
-    response:
-      Types.GetActivityInstanceConnectedParticipantsResponse,
-  ): void {
-    const participants: readonly DiscordUser[] =
-      response.participants.map((participant) => ({
-        id: participant.id,
-        username: participant.username,
-        globalName:
-          participant.global_name ?? null,
-        avatar: participant.avatar ?? null,
-      }));
-
-    this.participants.set(participants);
   }
 }
