@@ -7,6 +7,11 @@ import {
 
 import { RUNTIME_CONFIG } from '../../config/runtime-config.token';
 
+interface DiscordTokenResponse {
+  access_token?: string;
+  message?: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -23,6 +28,49 @@ export class DiscordSdkService {
     this.discordSdk = discordSdk;
 
     await discordSdk.ready();
+
+    const authorization =
+      await discordSdk.commands.authorize({
+        client_id:
+          this.runtimeConfig.discordClientId,
+        response_type: 'code',
+        state: '',
+        prompt: 'none',
+        scope: [
+          'identify',
+          'applications.commands',
+        ],
+      });
+
+    const tokenResponse = await fetch(
+      '/.proxy/api/token',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          code: authorization.code,
+        }),
+      },
+    );
+
+    const tokenData =
+      (await tokenResponse.json()) as DiscordTokenResponse;
+
+    if (
+      !tokenResponse.ok ||
+      !tokenData.access_token
+    ) {
+      throw new Error(
+        tokenData.message ??
+          'Discord token exchange failed.',
+      );
+    }
+
+    await discordSdk.commands.authenticate({
+      access_token: tokenData.access_token,
+    });
   }
 
   async getParticipants(): Promise<
