@@ -42,21 +42,26 @@ export class DiscordSdkService {
         ],
       });
 
-    const tokenResponse = await fetch(
-      '/.proxy/api/token',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          code: authorization.code,
-        }),
+    const tokenResponse = await fetch('/.proxy/api/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-    );
+      body: JSON.stringify({
+        code: authorization.code,
+      }),
+    });
+
+    const responseText = await tokenResponse.text();
+
+    console.log('Token endpoint response:', responseText);
+
+    if (!tokenResponse.ok) {
+      throw new Error(responseText);
+    }
 
     const tokenData =
-      (await tokenResponse.json()) as DiscordTokenResponse;
+      JSON.parse(responseText) as DiscordTokenResponse;
 
     if (
       !tokenResponse.ok ||
