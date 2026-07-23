@@ -4,7 +4,6 @@ import {
   inject,
 } from '@angular/core';
 
-import { RUNTIME_CONFIG } from '../../../config/runtime-config.token';
 import { DiscordService } from '../../data-access/discord.service';
 
 @Component({
@@ -15,10 +14,5 @@ import { DiscordService } from '../../data-access/discord.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DiscordDebugPanelComponent {
-  private readonly runtimeConfig = inject(RUNTIME_CONFIG);
-
   readonly discord = inject(DiscordService);
-
-  readonly runtimeMode =
-    this.runtimeConfig.runtimeMode;
 }
