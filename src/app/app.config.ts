@@ -14,6 +14,10 @@ import {
 import {
   provideSupabase,
 } from './core/supabase/supabase.providers';
+import { provideAuth } from './core/auth/data-access/auth.providers';
+import {
+  provideDiscord,
+} from './core/discord/discord.providers';
 
 export function createAppConfig(
   runtimeConfig: RuntimeConfig,
@@ -22,11 +26,15 @@ export function createAppConfig(
     providers: [
       provideZonelessChangeDetection(),
       provideRouter(routes),
+
       {
         provide: RUNTIME_CONFIG,
         useValue: runtimeConfig,
       },
+
       provideSupabase(),
+      provideAuth(),
+      provideDiscord(),
     ],
   };
 }

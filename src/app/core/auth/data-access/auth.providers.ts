@@ -4,6 +4,7 @@ import {
   makeEnvironmentProviders,
   provideAppInitializer,
 } from '@angular/core';
+
 import { AuthService } from './auth.service';
 
 export function provideAuth(): EnvironmentProviders {

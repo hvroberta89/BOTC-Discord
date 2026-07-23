@@ -1,0 +1,54 @@
+<section class="discord-debug-panel">
+  <h2>Discord Debug</h2>
+
+  <dl>
+    <div>
+      <dt>Runtime mode</dt>
+      <dd>{{ runtimeMode }}</dd>
+    </div>
+
+    <div>
+      <dt>Connection status</dt>
+      <dd>{{ discord.status() }}</dd>
+    </div>
+  </dl>
+
+  @if (discord.errorMessage(); as errorMessage) {
+    <p class="error">
+      {{ errorMessage }}
+    </p>
+  }
+
+  @if (discord.currentUser(); as user) {
+    <div>
+      <h3>Current user</h3>
+      <p>{{ user.globalName ?? user.username }}</p>
+    </div>
+  }
+
+  @if (discord.voiceChannel(); as voiceChannel) {
+    <div>
+      <h3>Voice channel</h3>
+      <p>{{ voiceChannel.name }}</p>
+    </div>
+  }
+
+  <div>
+    <h3>Participants</h3>
+
+    @if (discord.participants().length === 0) {
+      <p>No participants available.</p>
+    } @else {
+      <ul>
+        @for (
+          participant of discord.participants();
+          track participant.id
+        ) {
+          <li>
+            {{ participant.globalName ?? participant.username }}
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</section>
