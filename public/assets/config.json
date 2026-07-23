@@ -1,6 +1,6 @@
 {
   "supabaseUrl": "https://opkwlsanprzeyzqdmhqv.supabase.co",
   "supabasePublishableKey": "sb_publishable_R1jNYFjsKvQUrvKHknsfxA_bcGlLfLt",
-  "discordClientId": "",
-  "runtimeMode": "standalone"
+  "discordClientId": "1529104428534202540",
+  "runtimeMode": "discord-activity"
 }
