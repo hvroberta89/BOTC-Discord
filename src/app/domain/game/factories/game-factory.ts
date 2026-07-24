@@ -1,11 +1,13 @@
 import { Lobby } from '../../lobby/model/lobby';
 import { LobbyPlayer } from '../../lobby/model/lobby-player';
+import { ScriptId } from '../../scripts/model/script-id';
 import { Game } from '../model/game';
 import { GamePlayer } from '../model/game-player';
 
 export interface CreateGameFromLobbyParams {
   readonly gameId: string;
   readonly lobby: Lobby;
+  readonly scriptId: ScriptId;
 }
 
 export class GameFactory {
@@ -27,12 +29,16 @@ export class GameFactory {
     return lobbyPlayers.reduce(
       (game, lobbyPlayer) =>
         game.addPlayer(
-          this.createGamePlayer(lobbyPlayer),
+          this.createGamePlayer(
+            lobbyPlayer,
+          ),
         ),
       Game.create({
         id: params.gameId,
         lobbyId: params.lobby.id,
-        storytellerId: storyteller.id,
+        storytellerId:
+          storyteller.id,
+        scriptId: params.scriptId,
       }),
     );
   }
@@ -43,16 +49,21 @@ export class GameFactory {
     const storytellers =
       lobby.players.filter(
         (player) =>
-          player.role === 'storyteller',
+          player.role ===
+          'storyteller',
       );
 
-    if (storytellers.length === 0) {
+    if (
+      storytellers.length === 0
+    ) {
       throw new Error(
         'A game requires a storyteller.',
       );
     }
 
-    if (storytellers.length > 1) {
+    if (
+      storytellers.length > 1
+    ) {
       throw new Error(
         'A game cannot have multiple storytellers.',
       );
@@ -65,7 +76,8 @@ export class GameFactory {
     lobby: Lobby,
   ): readonly LobbyPlayer[] {
     return lobby.seatingOrder.players.filter(
-      (player) => player.role === 'player',
+      (player) =>
+        player.role === 'player',
     );
   }
 

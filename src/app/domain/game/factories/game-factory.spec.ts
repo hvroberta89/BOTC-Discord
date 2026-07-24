@@ -1,6 +1,7 @@
 import { Lobby } from '../../lobby/model/lobby';
 import { LobbyPlayer } from '../../lobby/model/lobby-player';
 import { LobbyPlayerRole } from '../../lobby/model/lobby-player-role';
+import { ScriptId } from '../../scripts/model/script-id';
 import { GameFactory } from './game-factory';
 
 describe('GameFactory', () => {
@@ -70,6 +71,9 @@ describe('GameFactory', () => {
       const game = gameFactory.create({
         gameId: 'game-1',
         lobby,
+        scriptId: ScriptId.create(
+          'trouble-brewing',
+        ),
       });
 
       expect(game.id).toBe('game-1');
@@ -105,6 +109,9 @@ describe('GameFactory', () => {
       const game = gameFactory.create({
         gameId: 'game-1',
         lobby,
+        scriptId: ScriptId.create(
+          'trouble-brewing',
+        ),
       });
 
       expect(game.players[0]).toEqual(
@@ -158,6 +165,9 @@ describe('GameFactory', () => {
       const game = gameFactory.create({
         gameId: 'game-1',
         lobby,
+        scriptId: ScriptId.create(
+          'trouble-brewing',
+        ),
       });
 
       expect(
@@ -207,6 +217,9 @@ describe('GameFactory', () => {
       const game = gameFactory.create({
         gameId: 'game-1',
         lobby,
+        scriptId: ScriptId.create(
+          'trouble-brewing',
+        ),
       });
 
       expect(game.players).toHaveLength(1);
@@ -251,6 +264,9 @@ describe('GameFactory', () => {
       const game = gameFactory.create({
         gameId: 'game-1',
         lobby,
+        scriptId: ScriptId.create(
+          'trouble-brewing',
+        ),
       });
 
       expect(game.players).toHaveLength(1);
@@ -282,6 +298,9 @@ describe('GameFactory', () => {
         gameFactory.create({
           gameId: 'game-1',
           lobby,
+          scriptId: ScriptId.create(
+            'trouble-brewing',
+          ),
         }),
       ).toThrow(
         'A game requires a storyteller.',
@@ -319,6 +338,9 @@ describe('GameFactory', () => {
         gameFactory.create({
           gameId: 'game-1',
           lobby,
+          scriptId: ScriptId.create(
+            'trouble-brewing',
+          ),
         }),
       ).toThrow(
         'A game requires at least one seated player.',
@@ -347,6 +369,9 @@ describe('GameFactory', () => {
         gameFactory.create({
           gameId: '   ',
           lobby,
+          scriptId: ScriptId.create(
+            'trouble-brewing',
+          ),
         }),
       ).toThrow(
         'Game ID cannot be empty.',
@@ -377,6 +402,9 @@ describe('GameFactory', () => {
       gameFactory.create({
         gameId: 'game-1',
         lobby,
+        scriptId: ScriptId.create(
+          'trouble-brewing',
+        ),
       });
 
       expect(lobby.players).toEqual(

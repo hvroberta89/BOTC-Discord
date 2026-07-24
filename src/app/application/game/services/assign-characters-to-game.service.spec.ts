@@ -3,6 +3,7 @@ import { CharacterId } from '../../../domain/characters/model/character-id';
 import { CharacterAssignment } from '../../../domain/game/model/character-assignment';
 import { Game } from '../../../domain/game/model/game';
 import { GamePlayer } from '../../../domain/game/model/game-player';
+import { ScriptId } from '../../../domain/scripts/model/script-id';
 import { CharacterRepository } from '../../../infrastructure/characters/repositories/character-repository';
 import { AssignCharactersToGameService } from './assign-characters-to-game.service';
 
@@ -109,8 +110,8 @@ describe(
       return Game.create({
         id: 'game-1',
         lobbyId: 'lobby-1',
-        storytellerId:
-          'storyteller-1',
+        storytellerId: 'storyteller-1',
+        scriptId: ScriptId.create('trouble-brewing'),
       })
         .addPlayer(firstPlayer)
         .addPlayer(secondPlayer);
