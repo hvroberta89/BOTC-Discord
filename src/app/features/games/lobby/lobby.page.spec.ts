@@ -1,4 +1,7 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {
+  ComponentFixture,
+  TestBed,
+} from '@angular/core/testing';
 
 import { LobbyPage } from './lobby.page';
 
@@ -12,8 +15,15 @@ describe('LobbyPage', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(LobbyPage);
+
+    fixture.componentRef.setInput(
+      'gameId',
+      'test-game-id',
+    );
+
     component = fixture.componentInstance;
-    await fixture.whenStable();
+
+    fixture.detectChanges();
   });
 
   it('should create', () => {
