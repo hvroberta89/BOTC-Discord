@@ -1,2 +1,283 @@
-<h1>Create game</h1>
-<p>Game creation will be implemented here.</p>
+<section class="create-game-page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">
+        Blood on the Clocktower
+      </p>
+
+      <h1>Create game</h1>
+
+      <p class="page-description">
+        Choose a script and create a new
+        game from the current lobby.
+      </p>
+    </div>
+
+    <div class="lobby-status">
+      <span class="status-indicator"></span>
+      Lobby ready
+    </div>
+  </header>
+
+  <div class="content-grid">
+    <section class="panel script-panel">
+      <div class="panel-header">
+        <div>
+          <p class="step-number">
+            Step 1
+          </p>
+
+          <h2>Choose a script</h2>
+        </div>
+      </div>
+
+      <label
+        class="field-label"
+        for="script"
+      >
+        Game script
+      </label>
+
+      <select
+        id="script"
+        class="script-select"
+        [value]="selectedScriptId()"
+        (change)="selectScript($event)"
+      >
+        @for (
+          script of scripts;
+          track script.id
+        ) {
+          <option [value]="script.id">
+            {{ script.name }}
+          </option>
+        }
+      </select>
+
+      <article class="script-preview">
+        <div class="script-icon">
+          {{
+            selectedScript()
+              .name
+              .charAt(0)
+          }}
+        </div>
+
+        <div>
+          <h3>
+            {{ selectedScript().name }}
+          </h3>
+
+          <p>
+            {{
+              selectedScript()
+                .description
+            }}
+          </p>
+        </div>
+      </article>
+    </section>
+
+    <section class="panel players-panel">
+      <div class="panel-header">
+        <div>
+          <p class="step-number">
+            Step 2
+          </p>
+
+          <h2>Review lobby</h2>
+        </div>
+
+        <span class="player-count">
+          {{ players.length }}
+          players
+        </span>
+      </div>
+
+      @if (storyteller) {
+        <article class="storyteller-row">
+          <div class="player-avatar">
+            {{
+              storyteller.displayName
+                .charAt(0)
+                .toUpperCase()
+            }}
+          </div>
+
+          <div class="player-details">
+            <strong>
+              {{
+                storyteller.displayName
+              }}
+            </strong>
+
+            <span>
+              Storyteller
+            </span>
+          </div>
+
+          <span class="storyteller-badge">
+            Storyteller
+          </span>
+        </article>
+      }
+
+      <div class="player-list">
+        @for (
+          player of players;
+          track player.id
+        ) {
+          <article class="player-row">
+            <div class="seat-number">
+              {{ player.seatNumber }}
+            </div>
+
+            <div class="player-avatar">
+              {{
+                player.displayName
+                  .charAt(0)
+                  .toUpperCase()
+              }}
+            </div>
+
+            <div class="player-details">
+              <strong>
+                {{ player.displayName }}
+              </strong>
+
+              <span>
+                Ready to play
+              </span>
+            </div>
+
+            <span class="ready-badge">
+              Ready
+            </span>
+          </article>
+        }
+      </div>
+    </section>
+  </div>
+
+  <section class="creation-panel">
+    <div>
+      <p class="step-number">
+        Step 3
+      </p>
+
+      <h2>Create the game</h2>
+
+      <p>
+        The game will use
+        <strong>
+          {{ selectedScript().name }}
+        </strong>
+        with
+        <strong>
+          {{ players.length }} players
+        </strong>.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="create-button"
+      [disabled]="isCreating()"
+      (click)="createGame()"
+    >
+      @if (isCreating()) {
+        Creating game...
+      } @else {
+        Create game
+      }
+    </button>
+  </section>
+
+  @if (errorMessage()) {
+    <section class="error-panel">
+      <strong>
+        Game creation failed
+      </strong>
+
+      <p>
+        {{ errorMessage() }}
+      </p>
+    </section>
+  }
+
+  @if (
+    createdGame();
+    as game
+  ) {
+    <section class="success-panel">
+      <div class="success-header">
+        <div class="success-icon">
+          ✓
+        </div>
+
+        <div>
+          <h2>Game created</h2>
+
+          <p>
+            The domain
+            <code>GameFactory</code>
+            successfully created the game.
+          </p>
+        </div>
+
+        <span class="game-state">
+          {{ game.state }}
+        </span>
+      </div>
+
+      <dl class="game-details">
+        <div>
+          <dt>Game ID</dt>
+          <dd>{{ game.id }}</dd>
+        </div>
+
+        <div>
+          <dt>Lobby ID</dt>
+          <dd>{{ game.lobbyId }}</dd>
+        </div>
+
+        <div>
+          <dt>Script</dt>
+          <dd>
+            {{ game.scriptId.value }}
+          </dd>
+        </div>
+
+        <div>
+          <dt>Storyteller ID</dt>
+          <dd>
+            {{ game.storytellerId }}
+          </dd>
+        </div>
+      </dl>
+
+      <div class="created-player-list">
+        <h3>Game players</h3>
+
+        @for (
+          player of game.players;
+          track player.id
+        ) {
+          <article class="created-player-row">
+            <span class="seat-number">
+              {{ player.seatNumber }}
+            </span>
+
+            <strong>
+              {{ player.displayName }}
+            </strong>
+
+            <span>
+              No character assigned
+            </span>
+          </article>
+        }
+      </div>
+    </section>
+  }
+</section>
