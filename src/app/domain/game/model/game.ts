@@ -1,3 +1,5 @@
+import { CharacterId } from '../../characters/model/character-id';
+import { CharacterAssignment } from './character-assignment';
 import { GamePlayer } from './game-player';
 import { GameState } from './game-state';
 
@@ -217,6 +219,18 @@ export class Game {
       );
     }
 
+    const playerWithoutCharacter =
+      this.playersValue.find(
+        (player) =>
+          player.characterId === null,
+      );
+
+    if (playerWithoutCharacter) {
+      throw new Error(
+        `Game player "${playerWithoutCharacter.id}" must receive a character before the game can be started.`,
+      );
+    }
+
     return this.copy({
       state: 'in-progress',
     });
@@ -281,6 +295,109 @@ export class Game {
 
     return this.replacePlayer(
       player.useGhostVote(),
+    );
+  }
+
+  public assignCharacters(
+    assignments: readonly CharacterAssignment[],
+  ): Game {
+    this.assertState(
+      'setup',
+      'Characters can only be assigned while the game is in setup.',
+    );
+
+    if (
+      assignments.length !==
+      this.playersValue.length
+    ) {
+      throw new Error(
+        'Every game player must receive exactly one character.',
+      );
+    }
+
+    const normalizedAssignments =
+      assignments.map((assignment) => ({
+        playerId:
+          Game.normalizeRequiredId(
+            assignment.playerId,
+            'Game player ID cannot be empty.',
+          ),
+        characterId:
+          assignment.characterId,
+      }));
+
+    this.assertUniqueAssignedPlayers(
+      normalizedAssignments,
+    );
+
+    this.assertUniqueAssignedCharacters(
+      normalizedAssignments,
+    );
+
+    const assignmentByPlayerId =
+      new Map(
+        normalizedAssignments.map(
+          (assignment) => [
+            assignment.playerId,
+            assignment.characterId,
+          ],
+        ),
+      );
+
+    for (const player of this.playersValue) {
+      if (
+        !assignmentByPlayerId.has(
+          player.id,
+        )
+      ) {
+        throw new Error(
+          `Game player "${player.id}" has no character assignment.`,
+        );
+      }
+    }
+
+    const updatedPlayers =
+      this.playersValue.map((player) => {
+        const characterId =
+          assignmentByPlayerId.get(
+            player.id,
+          );
+
+        if (!characterId) {
+          throw new Error(
+            `Game player "${player.id}" has no character assignment.`,
+          );
+        }
+
+        return player.assignCharacter(
+          characterId,
+        );
+      });
+
+    const hasChanges =
+      updatedPlayers.some(
+        (player, index) =>
+          player !==
+          this.playersValue[index],
+      );
+
+    if (!hasChanges) {
+      return this;
+    }
+
+    return this.copy({
+      players: updatedPlayers,
+    });
+  }
+
+  public getPlayerByCharacterId(
+    characterId: CharacterId,
+  ): GamePlayer | undefined {
+    return this.playersValue.find(
+      (player) =>
+        player.characterId?.equals(
+          characterId,
+        ) ?? false,
     );
   }
 
@@ -408,6 +525,55 @@ export class Game {
     ) {
       throw new Error(
         'Seat number must be a positive integer.',
+      );
+    }
+  }
+
+  private assertUniqueAssignedPlayers(
+    assignments: readonly CharacterAssignment[],
+  ): void {
+    const assignedPlayerIds =
+      new Set<string>();
+
+    for (const assignment of assignments) {
+      if (
+        assignedPlayerIds.has(
+          assignment.playerId,
+        )
+      ) {
+        throw new Error(
+          `Game player "${assignment.playerId}" received multiple character assignments.`,
+        );
+      }
+
+      assignedPlayerIds.add(
+        assignment.playerId,
+      );
+    }
+  }
+
+  private assertUniqueAssignedCharacters(
+    assignments: readonly CharacterAssignment[],
+  ): void {
+    const assignedCharacterIds =
+      new Set<string>();
+
+    for (const assignment of assignments) {
+      const characterId =
+        assignment.characterId.value;
+
+      if (
+        assignedCharacterIds.has(
+          characterId,
+        )
+      ) {
+        throw new Error(
+          `Character "${characterId}" was assigned to multiple game players.`,
+        );
+      }
+
+      assignedCharacterIds.add(
+        characterId,
       );
     }
   }

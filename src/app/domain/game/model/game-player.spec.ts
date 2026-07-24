@@ -1,3 +1,4 @@
+import { CharacterId } from '../../characters/model/character-id';
 import { GamePlayer } from './game-player';
 
 describe('GamePlayer', () => {
@@ -280,6 +281,124 @@ describe('GamePlayer', () => {
         player.revive(),
       ).toThrow(
         'Game player "game-player-1" is already alive.',
+      );
+    });
+  });
+
+  describe('assignCharacter', () => {
+    it('should assign a character immutably', () => {
+      const player = createPlayer();
+      const characterId =
+        CharacterId.create('imp');
+
+      const updatedPlayer =
+        player.assignCharacter(
+          characterId,
+        );
+
+      expect(player.characterId).toBeNull();
+
+      expect(
+        updatedPlayer.characterId,
+      ).toBe(characterId);
+
+      expect(updatedPlayer).not.toBe(
+        player,
+      );
+    });
+
+    it('should preserve the player properties', () => {
+      const player = createPlayer({
+        id: 'player-1',
+        userId: 'user-1',
+        displayName: 'Alice',
+        seatNumber: 3,
+      });
+
+      const updatedPlayer =
+        player.assignCharacter(
+          CharacterId.create('imp'),
+        );
+
+      expect(updatedPlayer.id).toBe(
+        player.id,
+      );
+
+      expect(updatedPlayer.userId).toBe(
+        player.userId,
+      );
+
+      expect(
+        updatedPlayer.displayName,
+      ).toBe(player.displayName);
+
+      expect(
+        updatedPlayer.seatNumber,
+      ).toBe(player.seatNumber);
+
+      expect(updatedPlayer.isAlive).toBe(
+        player.isAlive,
+      );
+
+      expect(
+        updatedPlayer.ghostVoteAvailable,
+      ).toBe(
+        player.ghostVoteAvailable,
+      );
+    });
+
+    it('should preserve the current player state', () => {
+      const player =
+        createPlayer().die();
+
+      const updatedPlayer =
+        player.assignCharacter(
+          CharacterId.create('imp'),
+        );
+
+      expect(updatedPlayer.isAlive).toBe(
+        false,
+      );
+
+      expect(
+        updatedPlayer.ghostVoteAvailable,
+      ).toBe(true);
+    });
+
+    it('should return the same player when assigning the same character', () => {
+      const firstCharacterId =
+        CharacterId.create('imp');
+
+      const secondCharacterId =
+        CharacterId.create('imp');
+
+      const player =
+        createPlayer().assignCharacter(
+          firstCharacterId,
+        );
+
+      const updatedPlayer =
+        player.assignCharacter(
+          secondCharacterId,
+        );
+
+      expect(updatedPlayer).toBe(player);
+    });
+
+    it('should reject assigning another character', () => {
+      const player =
+        createPlayer().assignCharacter(
+          CharacterId.create('imp'),
+        );
+
+      expect(() =>
+        player.assignCharacter(
+          CharacterId.create(
+            'washerwoman',
+          ),
+        ),
+      ).toThrow(
+        'Game player "game-player-1" already has character "imp".',
       );
     });
   });

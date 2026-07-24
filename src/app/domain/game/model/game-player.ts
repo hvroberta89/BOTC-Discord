@@ -1,3 +1,5 @@
+import { CharacterId } from '../../characters/model/character-id';
+
 export interface CreateGamePlayerParams {
   readonly id: string;
   readonly userId: string;
@@ -13,6 +15,7 @@ export class GamePlayer {
     public readonly seatNumber: number,
     public readonly isAlive: boolean,
     public readonly ghostVoteAvailable: boolean,
+    public readonly characterId: CharacterId | null,
   ) {}
 
   public static create(
@@ -47,6 +50,7 @@ export class GamePlayer {
       params.seatNumber,
       true,
       false,
+      null,
     );
   }
 
@@ -112,11 +116,35 @@ export class GamePlayer {
     });
   }
 
+  public assignCharacter(
+    characterId: CharacterId,
+  ): GamePlayer {
+    if (
+      this.characterId?.equals(
+        characterId,
+      )
+    ) {
+      return this;
+    }
+
+    if (this.characterId !== null) {
+      throw new Error(
+        `Game player "${this.id}" already has character "${this.characterId.value}".`,
+      );
+    }
+
+    return this.copy({
+      characterId,
+    });
+  }
+
   private copy(
     changes: Partial<{
       readonly seatNumber: number;
       readonly isAlive: boolean;
       readonly ghostVoteAvailable: boolean;
+      readonly characterId:
+        CharacterId | null;
     }>,
   ): GamePlayer {
     return new GamePlayer(
@@ -129,6 +157,9 @@ export class GamePlayer {
         this.isAlive,
       changes.ghostVoteAvailable ??
         this.ghostVoteAvailable,
+      changes.characterId === undefined
+        ? this.characterId
+        : changes.characterId,
     );
   }
 
