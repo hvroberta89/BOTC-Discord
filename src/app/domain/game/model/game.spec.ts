@@ -1,4 +1,5 @@
 import { CharacterId } from '../../characters/model/character-id';
+import { ScriptId } from '../../scripts/model/script-id';
 import { Game } from './game';
 import { GamePlayer } from './game-player';
 
@@ -33,6 +34,10 @@ describe('Game', () => {
       lobbyId: 'lobby-1',
       storytellerId:
         'storyteller-1',
+      scriptId:
+        ScriptId.create(
+          'trouble-brewing',
+        ),
     });
   }
 
@@ -71,6 +76,9 @@ describe('Game', () => {
       expect(game.storytellerId).toBe(
         'storyteller-1',
       );
+      expect(game.scriptId.value).toBe(
+        'trouble-brewing',
+      );
       expect(game.state).toBe('setup');
       expect(game.players).toEqual([]);
     });
@@ -81,6 +89,10 @@ describe('Game', () => {
         lobbyId: '  lobby-1  ',
         storytellerId:
           '  storyteller-1  ',
+        scriptId:
+          ScriptId.create(
+            'trouble-brewing',
+          ),
       });
 
       expect(game.id).toBe('game-1');
@@ -101,6 +113,10 @@ describe('Game', () => {
             lobbyId: 'lobby-1',
             storytellerId:
               'storyteller-1',
+            scriptId:
+              ScriptId.create(
+                'trouble-brewing',
+              ),
           }),
         ).toThrow(
           'Game ID cannot be empty.',
@@ -117,6 +133,10 @@ describe('Game', () => {
             lobbyId,
             storytellerId:
               'storyteller-1',
+            scriptId:
+              ScriptId.create(
+                'trouble-brewing',
+              ),
           }),
         ).toThrow(
           'Lobby ID cannot be empty.',
@@ -132,6 +152,10 @@ describe('Game', () => {
             id: 'game-1',
             lobbyId: 'lobby-1',
             storytellerId,
+            scriptId:
+              ScriptId.create(
+                'trouble-brewing',
+              ),
           }),
         ).toThrow(
           'Storyteller ID cannot be empty.',
@@ -178,6 +202,10 @@ describe('Game', () => {
       expect(
         updatedGame.storytellerId,
       ).toBe(game.storytellerId);
+
+      expect(updatedGame.scriptId).toBe(
+        game.scriptId,
+      );
 
       expect(updatedGame.state).toBe(
         game.state,
